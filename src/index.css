@@ -1,0 +1,453 @@
+import { useMemo, useState } from 'react';
+
+const modules = [
+  'Admin Dashboard',
+  'Project Management',
+  'Planning and Scheduling',
+  'Site Execution and RCC Work',
+  'Daily Progress Report (DPR)',
+  'Daily Labour Report (DLR)',
+  'Billing, BOQ, and RA Bills',
+  'Material Inventory',
+  'Manpower and Attendance',
+  'Quality Control',
+  'Safety Management',
+  'Engineering, Drawings, and BBS',
+  'HR Management',
+  'Accounts and Expenses',
+  'Document Register',
+  'Construction Calculators',
+  'Excel and PDF Report Export',
+];
+
+const projectData = [
+  { projectCode: 'PRJ-101', name: 'Corporate HQ Tower', location: 'Bengaluru', progress: 78, status: 'On Track', budget: 4800000, spent: 3740000 },
+  { projectCode: 'PRJ-204', name: 'Industrial Utility Complex', location: 'Pune', progress: 62, status: 'In Review', budget: 6200000, spent: 3840000 },
+  { projectCode: 'PRJ-316', name: 'Water Treatment Plant', location: 'Nagpur', progress: 49, status: 'Delayed', budget: 5300000, spent: 2610000 },
+  { projectCode: 'PRJ-440', name: 'Metro Station Expansion', location: 'Delhi', progress: 86, status: 'On Track', budget: 9100000, spent: 7810000 },
+];
+
+const dprRecords = [
+  { date: '2026-10-09', project: 'Corporate HQ Tower', location: 'Bengaluru', progress: 'RCC slab casting 86%', weather: 'Clear', manpower: 142, remarks: 'Concrete curing in progress' },
+  { date: '2026-10-08', project: 'Industrial Utility Complex', location: 'Pune', progress: 'Block work 64%', weather: 'Sunny', manpower: 117, remarks: 'Steel fixing on schedule' },
+  { date: '2026-10-07', project: 'Water Treatment Plant', location: 'Nagpur', progress: 'Pipe trenching 52%', weather: 'Humid', manpower: 96, remarks: 'Safety briefing completed' },
+];
+
+const inventoryItems = [
+  { item: 'Cement OPC 53 Grade', stock: 420, unit: 'bags', location: 'Warehouse-A', status: 'Healthy' },
+  { item: 'TMT Steel', stock: 184, unit: 'tons', location: 'Yard-B', status: 'Low' },
+  { item: 'River Sand', stock: 520, unit: 'cum', location: 'Stock Yard 1', status: 'Healthy' },
+  { item: 'PVC Pipes', stock: 95, unit: 'pieces', location: 'Store-G', status: 'Review' },
+];
+
+const billingRecords = [
+  { billNo: 'RA-2048', project: 'Metro Station Expansion', period: 'Sep 2026', amount: 2486000, status: 'Submitted' },
+  { billNo: 'RA-2043', project: 'Corporate HQ Tower', period: 'Sep 2026', amount: 1825000, status: 'Approved' },
+  { billNo: 'RA-2039', project: 'Industrial Utility Complex', period: 'Aug 2026', amount: 1432000, status: 'Pending' },
+  { billNo: 'RA-2031', project: 'Water Treatment Plant', period: 'Aug 2026', amount: 980000, status: 'Under Review' },
+];
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function App() {
+  const [activeTab, setActiveTab] = useState('Admin Dashboard');
+
+  const stats = useMemo(
+    () => [
+      { label: 'Active Projects', value: '18', change: '+3 this month', tone: 'navy' },
+      { label: 'Progress Completion', value: '72%', change: '+8.5% vs last week', tone: 'green' },
+      { label: 'Site Safety Index', value: '96.4%', change: 'Excellent compliance', tone: 'mint' },
+      { label: 'Outstanding Bills', value: '₹ 4.8 Cr', change: '4 pending approvals', tone: 'orange' },
+    ],
+    []
+  );
+
+  const progressBars = [
+    { name: 'RCC Works', value: 82 },
+    { name: 'Finishes', value: 68 },
+    { name: 'MEP', value: 57 },
+    { name: 'Earthworks', value: 74 },
+  ];
+
+  const renderSection = () => {
+    if (activeTab === 'Admin Dashboard') {
+      return (
+        <>
+          <header className="page-header">
+            <div>
+              <p className="eyebrow">Construction Command Center</p>
+              <h1>Admin Dashboard</h1>
+            </div>
+            <div className="header-badge">Demo Data</div>
+          </header>
+
+          <div className="stats-grid">
+            {stats.map((item) => (
+              <div key={item.label} className={`stat-card ${item.tone}`}>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+                <small>{item.change}</small>
+              </div>
+            ))}
+          </div>
+
+          <div className="content-grid two-up">
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Project Progress</h3>
+                <button className="ghost-btn">View all</button>
+              </div>
+              <div className="progress-list">
+                {progressBars.map((bar) => (
+                  <div key={bar.name} className="progress-row">
+                    <div className="progress-meta">
+                      <span>{bar.name}</span>
+                      <strong>{bar.value}%</strong>
+                    </div>
+                    <div className="progress-track">
+                      <div className="progress-fill" style={{ width: `${bar.value}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Site Efficiency</h3>
+                <button className="ghost-btn">Export</button>
+              </div>
+              <div className="mini-chart">
+                {[46, 54, 52, 72, 66, 86, 78].map((value, index) => (
+                  <div key={index} className="bar-col">
+                    <span style={{ height: `${value}%` }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="panel">
+            <div className="panel-head">
+              <h3>Project Portfolio</h3>
+              <button className="ghost-btn">Download report</button>
+            </div>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project Code</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                    <th>Budget</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {projectData.map((project) => (
+                    <tr key={project.projectCode}>
+                      <td>{project.projectCode}</td>
+                      <td>{project.name}</td>
+                      <td>{project.location}</td>
+                      <td>
+                        <div className="table-progress">
+                          <span>{project.progress}%</span>
+                          <div className="mini-track"><i style={{ width: `${project.progress}%` }} /></div>
+                        </div>
+                      </td>
+                      <td><span className={`pill ${project.status.toLowerCase().replace(/\s+/g, '-')}`}>{project.status}</span></td>
+                      <td>{formatCurrency(project.budget)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    if (activeTab === 'Project Management') {
+      return (
+        <>
+          <header className="page-header">
+            <div>
+              <p className="eyebrow">Portfolio Control</p>
+              <h1>Project Management</h1>
+            </div>
+            <button className="primary-btn">New Project</button>
+          </header>
+
+          <div className="panel">
+            <div className="panel-head">
+              <h3>Current Projects</h3>
+              <span className="soft-label">Demo Data</span>
+            </div>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Project</th>
+                    <th>Client</th>
+                    <th>Location</th>
+                    <th>Progress</th>
+                    <th>Budget</th>
+                    <th>Spent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {projectData.map((project) => (
+                    <tr key={project.projectCode}>
+                      <td>{project.projectCode}</td>
+                      <td>{project.name}</td>
+                      <td>Apex Infra</td>
+                      <td>{project.location}</td>
+                      <td>{project.progress}%</td>
+                      <td>{formatCurrency(project.budget)}</td>
+                      <td>{formatCurrency(project.spent)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    if (activeTab === 'Daily Progress Report (DPR)') {
+      return (
+        <>
+          <header className="page-header">
+            <div>
+              <p className="eyebrow">Field Reporting</p>
+              <h1>Daily Progress Report</h1>
+            </div>
+            <button className="primary-btn">Submit DPR</button>
+          </header>
+
+          <div className="content-grid two-up">
+            <div className="panel">
+              <div className="panel-head">
+                <h3>DPR Submission</h3>
+              </div>
+              <form className="form-grid">
+                <label>
+                  Project
+                  <select defaultValue="Corporate HQ Tower">
+                    <option>Corporate HQ Tower</option>
+                    <option>Industrial Utility Complex</option>
+                    <option>Water Treatment Plant</option>
+                  </select>
+                </label>
+                <label>
+                  Date
+                  <input type="date" defaultValue="2026-10-09" />
+                </label>
+                <label>
+                  Weather
+                  <input type="text" defaultValue="Clear" />
+                </label>
+                <label>
+                  Manpower Count
+                  <input type="number" defaultValue="142" />
+                </label>
+                <label className="full-width">
+                  Progress Description
+                  <textarea defaultValue="RCC slab casting completed for level 14 and 15. Curing scheduled for night shift. Fabrication and installation of formwork in progress." />
+                </label>
+                <label className="full-width">
+                  Remarks
+                  <textarea defaultValue="No major delays reported. Safety checklist verified." />
+                </label>
+                <button type="button" className="primary-btn">Save daily entry</button>
+              </form>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Recent DPR Entries</h3>
+              </div>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Project</th>
+                      <th>Progress</th>
+                      <th>Manpower</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {dprRecords.map((record) => (
+                      <tr key={`${record.project}-${record.date}`}>
+                        <td>{record.date}</td>
+                        <td>{record.project}</td>
+                        <td>{record.progress}</td>
+                        <td>{record.manpower}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    if (activeTab === 'Material Inventory') {
+      return (
+        <>
+          <header className="page-header">
+            <div>
+              <p className="eyebrow">Warehouse Monitoring</p>
+              <h1>Material Inventory</h1>
+            </div>
+            <button className="primary-btn">Add Material</button>
+          </header>
+
+          <div className="panel">
+            <div className="panel-head">
+              <h3>Stock Overview</h3>
+              <span className="soft-label">Demo Data</span>
+            </div>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Material</th>
+                    <th>Stock</th>
+                    <th>Unit</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inventoryItems.map((item) => (
+                    <tr key={item.item}>
+                      <td>{item.item}</td>
+                      <td>{item.stock}</td>
+                      <td>{item.unit}</td>
+                      <td>{item.location}</td>
+                      <td><span className={`pill ${item.status.toLowerCase()}`}>{item.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    if (activeTab === 'Billing, BOQ, and RA Bills') {
+      return (
+        <>
+          <header className="page-header">
+            <div>
+              <p className="eyebrow">Financial Control</p>
+              <h1>Billing and RA Bills</h1>
+            </div>
+            <button className="primary-btn">Create BOQ</button>
+          </header>
+
+          <div className="panel">
+            <div className="panel-head">
+              <h3>Current RA Bill Register</h3>
+              <span className="soft-label">Demo Data</span>
+            </div>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bill No</th>
+                    <th>Project</th>
+                    <th>Period</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {billingRecords.map((bill) => (
+                    <tr key={bill.billNo}>
+                      <td>{bill.billNo}</td>
+                      <td>{bill.project}</td>
+                      <td>{bill.period}</td>
+                      <td>{formatCurrency(bill.amount)}</td>
+                      <td><span className={`pill ${bill.status.toLowerCase().replace(/\s+/g, '-')}`}>{bill.status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <div className="panel empty-state">
+        <h3>{activeTab}</h3>
+        <p>This module is included in the product roadmap and is ready for future implementation.</p>
+      </div>
+    );
+  };
+
+  return (
+    <div className="app-shell">
+      <aside className="sidebar">
+        <div className="brand-box">
+          <div className="brand-mark">K</div>
+          <div>
+            <strong>KAHANI</strong>
+            <span>INFRACON</span>
+          </div>
+        </div>
+
+        <nav className="nav-menu">
+          {modules.map((item) => (
+            <button
+              key={item}
+              className={item === activeTab ? 'nav-item active' : 'nav-item'}
+              onClick={() => setActiveTab(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      <main className="main-panel">
+        <header className="topbar">
+          <div className="topbar-title">
+            <span className="mobile-tag">Menu</span>
+            <h2>Integrated Construction Management System</h2>
+          </div>
+          <div className="topbar-actions">
+            <button className="ghost-btn">Notifications</button>
+            <div className="user-pill">
+              <span className="user-avatar">AS</span>
+              <div>
+                <strong>Ashwini Tiwari</strong>
+                <small>Super Admin</small>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {renderSection()}
+      </main>
+    </div>
+  );
+}
+
+export default App;

@@ -1,0 +1,40 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kahani-postgres
+    environment:
+      POSTGRES_DB: kahani_infracon
+      POSTGRES_USER: kahani
+      POSTGRES_PASSWORD: kahani123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kahani -d kahani_infracon"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: kahani-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://kahani:kahani123@postgres:5432/kahani_infracon
+      PORT: 3001
+      VITE_API_URL: http://localhost:3001
+    ports:
+      - "3001:3001"
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+volumes:
+  pgdata:
